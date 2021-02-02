@@ -1,0 +1,138 @@
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <h1 class="p-m-2">Dédoublonne  Salariés</h1>
+        </ng-template>
+
+    </p-toolbar>
+
+    <p-table #dt [value]="salriesData" [rows]="5" [paginator]="true" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5,10,20]"  [globalFilterFields]="['codesalarie','prenom','adresse','anneExp','salaire','fonction','date']"
+        [(selection)]="selectedSalaries"  [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="montrant {first} a {last} de  {totalRecords} entrées" [showCurrentPageReport]="true">
+        
+        
+        <ng-template pTemplate="caption">
+            <div class="ui-fluid">
+    
+            <div class=" p-field p-grid">
+         <button pButton pRipple label="Create" icon="pi pi-plus" class="p-col-12 p-md-2 " (click)="openNew()"></button> 
+
+                <span class="p-input-icon-left" class="p-col-12 p-md-10">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="recherche..." />
+                </span>
+            </div></div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          
+                
+               
+            <tr>
+            
+                <th pSortableColumn="prenom">Prenom <p-sortIcon field="prenom"></p-sortIcon></th>
+                <th pSortableColumn="fonction">fonction <p-sortIcon field="fonction"></p-sortIcon></th>
+                <th pSortableColumn="adresse">adresse <p-sortIcon field="adresse"></p-sortIcon></th>
+                <th pSortableColumn="salaire">salaire <p-sortIcon field="salaire"></p-sortIcon></th>
+                <th pSortableColumn="anneExp">Annees experience <p-sortIcon field="anneExp"></p-sortIcon></th>
+                <th pSortableColumn="date">Date du naissance<p-sortIcon field="date"></p-sortIcon></th>
+
+            </tr>
+            
+            <tr>
+    
+            <th>
+                <input pInputText type="text" (input)="dt.filter($event.target.value, 'prenom', 'startsWith')" placeholder="chercher par nom" class="p-column-filter">
+            </th>
+            <th>
+                <input pInputText type="text" (input)="dt.filter($event.target.value, 'fonction', 'contains')" placeholder="chercher par fonction" class="p-column-filter">
+            </th>
+            <th>
+                <input pInputText type="text" (input)="dt.filter($event.target.value, 'adresse', 'contains')" placeholder="chercher par adresse" class="p-column-filter">
+            </th>
+            <th>
+                <input pInputText   type="text" (input)="dt.filter($event.target.value, 'salaire', 'contains')" placeholder="chercher par salaire" class="p-column-filter">
+            </th>
+            <th>
+                <input pInputText  type="text" (input)="dt.filter($event.target.value, 'anneExp', 'contains')" placeholder="chercher par annees experience" class="p-column-filter">
+            </th>
+            <th>
+                <p-calendar class="calendar1"   (onSelect)="onDateSelect($event)" (onClearClick)="dt.filter('', 'date', 'equals')" [monthNavigator]="true" [yearNavigator]="true" yearRange="1910:2030" [showButtonBar]="true" styleClass="p-column-filter"  placeholder="Date du naissance" [readonlyInput]="true" dateFormat="dd.mm.yy"></p-calendar>
+            </th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-salarie>
+            <tr>
+        
+                <td>{{salarie.prenom}}</td>
+                <td>{{salarie.fonction}}</td>
+                <td>{{salarie.adresse}}</td>
+                <td>{{salarie.salaire}}</td>
+                <td>{{salarie.anneExp}}</td>
+                <td>{{salarie.date | date:'dd/MM/yyyy'}}</td>
+
+
+
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2" (click)="editSalarie(salarie)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="deleteSalarie(salarie)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                le total est {{salriesData ? salriesData.length : 0 }} salarié.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="salarieDialog"[style]="{width: '50vw'}" header="salarie Detaille" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        
+        <div class="p-field">
+            <label for="prenom">Prenom</label>
+            <input type="text"   pInputText id="prenom" [(ngModel)]="salarie.prenom" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !salarie.prenom">Prenom obligatoire.</small>
+        </div>
+        
+        <div class="p-field">
+            <label for="fonction">Fonction</label>
+            <input type="text" pInputText id="fonction" [(ngModel)]="salarie.fonction" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !salarie.fonction">Fonction obligatoire.</small>
+        </div>
+        <div class="p-field">
+            <label for="adresse">Adresse</label>
+            <input type="text" pInputText id="adresse" [(ngModel)]="salarie.adresse" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !salarie.adresse">Adresse obligatoire.</small>
+        </div>
+        <div class="p-field">
+            <label for="salaire">Salaire</label>
+            <p-inputNumber  id="salaire" [(ngModel)]="salarie.salaire"  [min]="0" [max]="100000" required autofocus ></p-inputNumber>
+            <small class="p-invalid" *ngIf="submitted && !salarie.salaire">Salaire obligatoire.</small>
+        </div>
+    
+            <div class="p-field">
+                <label for="anneexp">Annees experience</label>
+                <p-inputNumber id="anneexp" [(ngModel)]="salarie.anneExp" mode="decimal" [min]="0" [max]="50" required autofocus ></p-inputNumber>
+                <small class="p-invalid" *ngIf="submitted && !salarie.anneExp">Salaire obligatoire.</small>
+
+            </div>
+            <div class="p-field">
+                <label for="date">Date du naissance</label>
+                <p-calendar id="date" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}" [monthNavigator]="true" [yearNavigator]="true" yearRange="1910:2030" showButtonBar="true"  [styleClass]="'custom-height'" [showIcon]="true"  [(ngModel)]="salarie.date" dateFormat="dd.mm.yy">
+                </p-calendar>
+                <small class="p-invalid" *ngIf="submitted && !salarie.date">Date obligatoire.</small>
+    
+            </div>
+       
+    </ng-template>
+    
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveSalarie()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
